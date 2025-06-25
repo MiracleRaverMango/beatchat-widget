@@ -1,35 +1,35 @@
 // rollup.config.js
 import resolve  from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
-import { terser } from 'rollup-plugin-terser';
+import { terser }    from 'rollup-plugin-terser';
 import postcss  from 'rollup-plugin-postcss';
 
 export default [
-  // — Bundle JS into an IIFE for <script> tags —
+  // —————————————————————— JS Bundle ——————————————————————
   {
     input:  'public/client.js',
     output: {
-      file:   'dist/beatchat.min.js',
+      file:   'docs/beatchat.min.js',
       format: 'iife',
       name:   'BeatChatWidget'
     },
     plugins: [
-      resolve(),    // find node_modules imports
-      commonjs(),   // convert CJS → ESM
-      terser()      // minify JS
+      resolve(),
+      commonjs(),
+      terser()
     ]
   },
 
-  // — Bundle & minify CSS into a single file —
+  // ————————————————————— CSS Bundle —————————————————————
   {
     input:  'public/styles.css',
     output: {
-      file: 'dist/beatchat.min.css'
+      file: 'docs/beatchat.min.css'  // this value is ignored for JS, but PostCSS will write the CSS here
     },
     plugins: [
       postcss({
-        extract:  true,  // output to its own .css file
-        minimize: true   // minify CSS
+        extract:  true,    // writes to docs/beatchat.min.css
+        minimize: true
       })
     ]
   }
