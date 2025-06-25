@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BeatChat</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <nav class="navbar">
+  <h1>BeatChat</h1>
+  <button id="sidebar-toggle" class="mobile-only">☰</button>
+</nav>
+
+
+  <main>
+    <!-- SIDEBAR -->
+<aside class="sidebar">
+  <!-- — Users panel — -->
+  <section class="users">
+    <div class="room-info">
+      <span>Room: <strong id="room-label"></strong></span>
+      <button id="change-room">Rename Room</button>
+      <span>Your Name: <strong id="user-label"></strong></span>
+      <button id="change-name">Change Name</button>
+    </div>
+    <h2>Users</h2>
+    <ul id="user-list"></ul>
+  </section>
+
+  <!-- — Suggest a Track panel — -->
+  <section class="suggest-box">
+    <h2>Suggest a Track</h2>
+    <form id="request-form">
+      <input id="request-input" placeholder="Paste URL or <iframe> link" />
+      <button type="submit">Suggest</button>
+    </form>
+  </section>
+
+  <!-- — All Suggestions panel — -->
+  <section class="queue-listing">
+    <h2>All Suggestions</h2>
+    <ul id="queue-list"></ul>
+  </section>
+</aside>
+
+
+
+    <!-- PLAYER AREA -->
+    <section class="player-area">
+      <div class="now-next">
+        <div class="now-playing">
+          <h2>Now Playing</h2>
+          <div id="embed-player"><em>Nothing playing</em></div>
+        </div>
+        <div class="next-up">
+          <h2>Next Up</h2>
+          <div id="next-up-preview"><em>No suggestions yet</em></div>
+          <div class="controls">
+            <button id="play-next" disabled>▶ Play Next</button>
+            <button id="force-play-next">⚡ Force</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chat panel -->
+     <section class="chat-box">
+  <div class="chat-header">
+    <h2>Chat</h2>
+    <button id="theme-toggle" title="Toggle light/dark">🌓</button>
+  </div>
+  <div id="chat-messages"></div>
+  <div class="chat-input">
+    <input id="message" placeholder="Type a message…" />
+    <button id="send">Send</button>
+  </div>
+</section>
+
+  </main>
+
+  <footer class="footer-info">
+    
+  </footer>
+
+  <script src="https://w.soundcloud.com/player/api.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="client.js"></script>
+
+
+</body>
+</html>

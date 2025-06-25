@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SC Embed Test</title>
+  <style>
+    body { font-family: sans-serif; padding: 1rem; }
+    #embed { margin-top: 1rem; }
+    input { width: 80%; padding: .5rem; }
+    button { padding: .5rem 1rem; }
+  </style>
+</head>
+<body>
+  <h1>SoundCloud Embed Tester</h1>
+  <form id="sc-form">
+    <input id="sc-input" placeholder="Paste SoundCloud URL" autocomplete="off" />
+    <button type="submit">Embed</button>
+  </form>
+  <div id="embed"><em>Nothing embedded yet.</em></div>
+
+  <script>
+    const form      = document.getElementById('sc-form');
+    const input     = document.getElementById('sc-input');
+    const embedDiv  = document.getElementById('embed');
+
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      const raw = input.value.trim();
+      if (!raw) return alert('Please paste a SoundCloud URL.');
+
+      // strip params
+      const clean = raw.split('?')[0];
+
+      // build player URL
+      const src = [
+        'https://w.soundcloud.com/player/',
+        '?url=' + encodeURIComponent(clean),
+        '&color=%23ff5500',
+        '&auto_play=false',
+        '&hide_related=false',
+        '&show_comments=true',
+        '&show_user=true',
+        '&show_reposts=false'
+      ].join('');
+/* ——————————————————————— */
+/* All embeds, everywhere — full-width 16∶9 */
+/* ——————————————————————— */
+.embed-container {
+  position: relative;
+  width:    100%;
+  aspect-ratio: 16 / 9;      /* true 16:9 */
+  overflow: hidden;
+  margin-bottom: 1rem;       /* your breathing room */
+}
+.embed-container iframe {
+  position: absolute;
+  inset:    0;               /* top/left/right/bottom = 0 */
+  width:    100%;
+  height:   100%;
+  border:   0;
+}
+
+/* Keep your Next-Up / Now-Playing split exactly as is: */
+.player-area .now-next {
+  display: flex;
+  gap: var(--space-lg);
+}
+@media (min-width: 600px) {
+  .player-area .now-next { flex-direction: row; }
+}
+.player-area .now-next .now-playing { flex: 2 1 auto; }
+.player-area .now-next .next-up    { flex: 1 1 auto; }
+
+  </script>
+</body>
+</html>

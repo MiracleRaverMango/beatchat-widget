@@ -1,0 +1,457 @@
+/* ========================================================================== */
+/* VARIABLES                                                                  */
+/* ========================================================================== */
+:root {
+  --bg:        #f0f4f8;   /* soft off-white */
+  --fg:        #2a2f3a;   /* dark slate */
+  --card:      #ffffff;   /* clean white cards */
+  --accent:    #009688;   /* teal */
+  --muted:     #536878;   /* slate grey */
+  --space-xs:  4px;
+  --space-sm:  8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+
+  /* scrollbar (light) */
+  --scroll-track-light:       #f1f1f1;
+  --scroll-thumb-light:       #888;
+  --scroll-thumb-light-hover: #555;
+
+  /* scrollbar (dark) */
+  --scroll-track-dark:        #2a2a2a;
+  --scroll-thumb-dark:        #555;
+  --scroll-thumb-dark-hover:  #777;
+}
+
+/* Dark-mode overrides */
+body.dark {
+  --bg:     #0d1117;
+  --fg:     #c9d1d9;
+  --card:   #161b22;
+  --accent: #0ff;
+  --muted:  #8b949e;
+}
+
+/* ========================================================================== */
+/* GLOBAL & RESET                                                             */
+/* ========================================================================== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+body {
+  margin:     0;
+  padding:    0;
+  background: var(--bg);
+  color:      var(--fg);
+  font-family: sans-serif;
+  font-size:  16px;
+}
+h1, h2 { margin: 0; }
+button, input { font: inherit; }
+
+/* ========================================================================== */
+/* NAVBAR                                                                     */
+/* ========================================================================== */
+.navbar {
+  display:         flex;
+  justify-content: space-between;
+  align-items:     center;
+  background:      var(--card);
+  padding:         var(--space-sm) var(--space-lg);
+  box-shadow:      0 2px 4px rgba(0,0,0,0.2);
+  position:        sticky;
+  top:             0;
+  z-index:         10;
+}
+.navbar h1 { font-size: 1.25rem; }
+#theme-toggle,
+.mobile-only {
+  background: none;
+  border:     none;
+  font-size:  1.2rem;
+  color:      var(--accent);
+  cursor:     pointer;
+}
+
+/* ========================================================================== */
+/* LAYOUT                                                                     */
+/* ========================================================================== */
+main {
+  display:             flex;
+  grid-template-columns: 1fr;
+  gap:                 var(--space-lg);
+  padding:             var(--space-lg);
+  flex-wrap:           wrap;
+}
+@media (max-width: 600px) {
+  main {
+    flex-direction: column;
+  }
+  .sidebar,
+  .player-area {
+    flex: 1 1 100%;
+  }
+}
+
+@media (min-width: 900px) {
+  main { grid-template-columns: 1fr 3fr; }
+}
+/* mobile sidebar as bottom sheet */
+@media (max-width: 600px) {
+  .mobile-only { display: inline-block; }
+  .sidebar {
+    position:     fixed;
+    bottom:       0;
+    left:         0;
+    right:        0;
+    max-height:   80%;
+    background:   var(--card);
+    transform:    translateY(100%);
+    transition:   transform 0.3s ease;
+    overflow-y:   auto;
+    z-index:      20;
+  }
+  .sidebar.open { transform: translateY(0); }
+  main.shifted  { margin-bottom: 80%; transition: margin-bottom 0.3s ease; }
+}
+@media (min-width: 601px) {
+  .mobile-only { display: none; }
+  .sidebar     { position: static; transform: none; }
+}
+
+/* ========================================================================== */
+/* SIDEBAR PANELS                                                             */
+/* ========================================================================== */
+.layout {
+  display: grid;
+  grid-template-columns: 200px 1fr;      /* sidebar is 200px, rest fills */
+  gap: 16px;                             /* gutter between columns */
+  padding: 16px;
+}
+.sidebar {
+  display:         flex;
+  flex-direction:  column;
+  gap:             var(--space-md);
+  /*background:      var(--card);*/
+  padding: 1px;
+  flex: 0 0 300px;
+}
+.sidebar > * {
+  flex: none;    /* don’t let any panel try to grow or shrink unexpectedly */
+}
+
+.sidebar ul li {
+  display: flex;
+  align-items: center;
+}
+
+.sidebar ul li span {
+  flex-grow: 1;
+}
+
+/* small, emoji‐only buttons */
+.action-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-left: 4px;
+  font-size: 1.1em;
+  line-height: 1;
+  padding: 2px;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;         /* space between player-area and chat-box */
+}
+.sidebar section {
+  background:    var(--card);
+  padding:       var(--space-md);
+  border-radius: 4px;
+  margin-bottom: var(--space-md);
+}
+
+/* — Room & Users — */
+.users .room-info {
+  display:         flex;
+  justify-content: center;
+  gap:             var(--space-md);
+  margin-bottom:   var(--space-sm);
+  font-size:       0.9rem;
+  color:           var(--muted);
+}
+
+/* — Suggest Box — */
+.suggest-box {
+  display:         flex;
+  flex-direction:  column;
+  gap:             var(--space-sm);
+  max-height:      150px;
+}
+@media (max-width: 600px) {
+  .suggest-box {
+    display: block !important;
+    margin: 1rem 0;   /* give it a little breathing room */
+  }
+}
+
+.suggest-box input {
+  padding:       var(--space-xs);
+  background:    var(--card);
+  border:        1px solid var(--muted);
+  border-radius: 3px;
+  color:         var(--fg);
+}
+.suggest-box button {
+  padding: var(--space-xs) var(--space-md);
+}
+.suggest-box, .queue-listing {
+  max-width: 401px;
+}
+/* — Chat Box — */
+.chat-box {
+  display:         flex;
+  flex-direction:  column;
+  height:          400px;
+}
+.chat-header {
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  margin-bottom:   var(--space-sm);
+  margin-top:      18px;
+}
+#chat-messages {
+  flex:            1 1 auto;
+  min-height:      0;
+  background:      var(--card);
+  border:          1px solid var(--muted);
+  border-radius:   4px;
+  padding:         var(--space-sm);
+  overflow-y:      auto;
+}
+/* chat scrollbar WebKit */
+#chat-messages::-webkit-scrollbar             { width: 8px; }
+#chat-messages::-webkit-scrollbar-track       { background: var(--scroll-track-light); }
+#chat-messages::-webkit-scrollbar-thumb       { background: var(--scroll-thumb-light); border-radius:4px; }
+#chat-messages::-webkit-scrollbar-thumb:hover { background: var(--scroll-thumb-light-hover); }
+/* dark overrides */
+body.dark #chat-messages::-webkit-scrollbar-track       { background: var(--scroll-track-dark); }
+body.dark #chat-messages::-webkit-scrollbar-thumb       { background: var(--scroll-thumb-dark); }
+body.dark #chat-messages::-webkit-scrollbar-thumb:hover { background: var(--scroll-thumb-dark-hover); }
+/* chat scrollbar Firefox */
+#chat-messages { scrollbar-width: thin; scrollbar-color: var(--scroll-thumb-light) var(--scroll-track-light); }
+body.dark #chat-messages { scrollbar-color: var(--scroll-thumb-dark) var(--scroll-track-dark); }
+
+.chat-input {
+  display:    flex;
+  gap:        var(--space-sm);
+  margin-top: var(--space-sm);
+}
+.chat-input input {
+  flex:          1;
+  padding:       var(--space-xs);
+  background:    var(--card);
+  border:        1px solid var(--muted);
+  border-radius: 3px;
+  color:         var(--fg);
+}
+.chat-input button {
+  padding: var(--space-xs) var(--space-md);
+}
+
+/* ========================================================================== */
+/* PLAYER AREA                                                                 */
+/* ========================================================================== */
+.player-area {
+  flex: 1;
+}
+
+.player-area .now-next {
+  display: flex;
+  gap:     var(--space-lg);
+}
+@media (min-width: 600px) {
+  .player-area .now-next { flex-direction: row; }
+}
+.player-area .now-next .now-playing { flex: 2 0 auto; 
+display: grid;
+}
+.player-area .now-next .next-up    { flex: 1 1 0; }
+.player-area .now-next .now-playing,
+.player-area .now-next .next-up {
+  background:    var(--card);
+  padding:       var(--space-md);
+  border-radius: 4px;
+}
+
+
+/* ========================================================================== */
+/* QUEUE LIST                                                                  */
+/* ========================================================================== */
+.queue-listing {
+  background:    var(--card);
+  padding:       var(--space-md);
+  border-radius: 4px;
+  /*margin-top:    var(--space-lg);*/
+
+  /* <— bump max-height taller */
+  max-height:    500px;
+  overflow-y:    auto;
+
+  /* extra top padding so H2 sits fully */
+  padding-top:   calc(var(--space-md) + 8px);
+  box-sizing:    border-box;
+}
+.queue-listing h2 {
+  margin-top: 0;  /* prevent any default top margin */
+}
+/* queue scrollbar WebKit */
+.queue-listing::-webkit-scrollbar             { width: 8px; }
+.queue-listing::-webkit-scrollbar-track       { background: var(--scroll-track-light); }
+.queue-listing::-webkit-scrollbar-thumb       { background: var(--scroll-thumb-light); border-radius:4px; }
+.queue-listing::-webkit-scrollbar-thumb:hover { background: var(--scroll-thumb-light-hover); }
+/* dark overrides */
+body.dark .queue-listing::-webkit-scrollbar-track       { background: var(--scroll-track-dark); }
+body.dark .queue-listing::-webkit-scrollbar-thumb       { background: var(--scroll-thumb-dark); }
+body.dark .queue-listing::-webkit-scrollbar-thumb:hover { background: var(--scroll-thumb-dark-hover); }
+/* queue scrollbar Firefox */
+.queue-listing { scrollbar-width: thin; scrollbar-color: var(--scroll-thumb-light) var(--scroll-track-light); }
+body.dark .queue-listing { scrollbar-color: var(--scroll-thumb-dark) var(--scroll-track-dark); }
+
+#queue-list li {
+  background:    var(--bg);
+  border:        1px solid var(--muted);
+  padding:       var(--space-sm);
+  border-radius: 4px;
+  margin-bottom: var(--space-sm);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+#queue-list li > * {
+  margin-bottom: 0.5rem;
+}
+
+/* ========================================================================== */
+/* TYPO, BUTTONS & MISC                                                         */
+/* ========================================================================== */
+h1 { font-size: 1.5rem; margin-bottom: var(--space-md); }
+h2 { margin-bottom: var(--space-sm); }
+button {
+  background:    var(--accent);
+  color:         #000;
+  border:        none;
+  border-radius: 3px;
+  cursor:        pointer;
+  padding:       var(--space-xs) var(--space-md);
+  transition:    opacity .2s ease;
+}
+button:disabled { opacity: .5; cursor: default; }
+button:not(:disabled):hover { opacity: .8; }
+
+.play-overlay {
+  position:   absolute;
+  inset:      0;
+  background: rgba(0,0,0,0.6);
+  color:      #fff;
+  display:    flex;
+  align-items: center;
+  justify-content: center;
+  font-size:  1.2rem;
+  border-radius: 4px;
+}
+
+.user-action {
+  font-style: italic;
+  color:      var(--muted);
+  margin:     var(--space-xs) 0;
+}
+
+
+
+
+.vote-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+.vote-controls button {
+  margin: 0;
+  padding: 0.25rem;
+  cursor: pointer;
+}
+
+/* 1) Center and contain the embed in its pane */
+.player-area .now-next .now-playing {
+  display:        grid;        /* turn on grid centering */    
+  padding:        var(--space-md);
+  box-sizing:     border-box;
+}
+
+/* ——————————————————————— */
+/* All embeds, everywhere — full-width 16∶9 */
+/* ——————————————————————— */
+.embed-container {
+  position: relative;
+  width:    100%;
+  aspect-ratio: 16 / 9;      /* true 16:9 */
+  overflow: hidden;
+  margin-bottom: 1rem;       /* your breathing room */
+}
+.embed-container iframe {
+  position: absolute;
+  inset:    0;               /* top/left/right/bottom = 0 */
+  width:    100%;
+  height:   100%;
+  border:   0;
+}
+
+/* Keep your Next-Up / Now-Playing split exactly as is: */
+.player-area .now-next {
+  display: flex;
+  gap: var(--space-lg);
+}
+@media (min-width: 600px) {
+  .player-area .now-next { flex-direction: row; }
+}
+.player-area .now-next .now-playing { flex: 2 1 auto; }
+.player-area .now-next .next-up    { flex: 1 1 auto; }
+
+/* ————————————————————————————————— */
+/* 1) Give Next-Up a bit more real estate */
+/* ————————————————————————————————— */
+@media (min-width: 600px) {
+  .player-area .now-next .now-playing {
+    /* grow a little more aggressively */
+    flex: 3 1 auto;
+  }
+  .player-area .now-next .next-up {
+    /* still shrink if you must, but start wider */
+    flex: 2 1 auto;
+    /* and never go below 300px so it’s always legible */
+    min-width: 300px;
+  }
+}
+
+/* ————————————————————————————————— */
+/* 2) Make every Now-Playing iframe fill its column at 16∶9 */
+/* ————————————————————————————————— */
+.player-area .now-next .now-playing iframe {
+  width:          100%   !important;  /* full column width */
+  height:         auto   !important;  /* auto–height keeps aspect */
+  aspect-ratio:   16 / 9 !important;  /* enforce 16:9 natively */
+  max-width:      100%   !important;  /* just in case */
+}
+
+
+.footer-info {
+  background: var(--card);
+  text-align: center;
+  padding:    var(--space-sm);
+}
