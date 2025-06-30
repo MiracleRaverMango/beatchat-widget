@@ -151,6 +151,8 @@ reqForm.addEventListener('submit', e => {
   // 4) join + name-change flow
   let awaitingJoin = true;
   socket.emit('join', room, username);
+  socket.emit('request users');
+
   socket.on('name taken', taken => {
     const wasJoin = awaitingJoin;
     let newName;
@@ -173,6 +175,13 @@ reqForm.addEventListener('submit', e => {
 // Unified users+mods rendering
 socket.on('room users', users => {
   userList.innerHTML = '';
+
+  const forceBtn = document.getElementById('force-play-next');
+  if (currentMods.includes(username)) {
+    forceBtn.style.display = '';       // show if I'm a mod
+  } else {
+    forceBtn.style.display = 'none';   // hide otherwise
+  }
 
   users.forEach(name => {
     const li   = document.createElement('li');

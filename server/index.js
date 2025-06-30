@@ -24,6 +24,17 @@ mongoose.connection
 const app    = express();
 const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: '*' } });
+const path = require('path');
+
+// Serve everything under ../public (your index.html, client.js, styles.css, etc)
+app.use(express.static(path.join(__dirname, '../public')));
+
+// Guarantee GET / serves public/index.html
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/index.html'));
+});
+
+
 
 applyModMiddleware(io);
 app.use(express.static('public'));
@@ -55,10 +66,7 @@ io.on('connection', socket => {
       socket.emit('name taken', username);
       return;
     }
-socket.on('request users', () => {
-  const names = roomUsers[currentRoom].map(u => u.username);
-  io.in(currentRoom).emit('room users', names);
-});
+
 
 // … inside io.on('connection', socket => { … })
 socket.on('ban user', targetUsername => {
@@ -111,6 +119,13 @@ socket.on('change room', ({ oldRoom, newRoom }) => {
     if (!room) room = await Room.create({ name: roomName, queue: [] });
     socket.emit('queue updated', room.queue);
   });
+
+  
+  socket.on('request users', () => {
+  const names = roomUsers[currentRoom].map(u => u.username);
+  io.in(currentRoom).emit('room users', names);
+});
+
 socket.on('kick user', targetUsername => {
   const me = roomUsers[currentRoom]?.find(u => u.socketId === socket.id);
   if (!me?.isMod) {
